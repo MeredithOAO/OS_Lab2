@@ -95,8 +95,8 @@ timer_sleep (int64_t ticks)
   if (ticks)
   {
     enum intr_level last_intr_level = intr_disable();
-    struct thread *thread = thread_current;
-    thread->block_ticks_remain = ticks;
+    struct thread *t = thread_current;
+    t->block_ticks_remain = ticks;
     thread_block();
     intr_set_level(last_intr_level);
     

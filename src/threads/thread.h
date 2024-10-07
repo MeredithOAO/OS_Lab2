@@ -141,6 +141,6 @@ int thread_get_load_avg (void);
 
 
 //new for lab 2
-void check_block_state(struct thread *thread);
+void check_block_state(struct thread *thread, void *aux);
 
 #endif /* threads/thread.h */

@@ -215,15 +215,15 @@ thread_create (const char *name, int priority,
 }
 
 //new for lab2 to check if block and calculate block ticks
-void check_block_state(struct thread *thread){
-if (thread->status == THREAD_BLOCKED)
+void check_block_state(struct thread *t, void *aux){
+if (t->status == THREAD_BLOCKED)
 {
-  if (thread->block_ticks_remain != 0)
+  if (t->block_ticks_remain != 0)
   {
-    thread->block_ticks_remain--;
-  }else if (thread->block_ticks_remain ==0)
+    t->block_ticks_remain--;
+  }else if (t->block_ticks_remain ==0)
   {
-    thread_unblock(thread);
+    thread_unblock(t);
   }
   
   
