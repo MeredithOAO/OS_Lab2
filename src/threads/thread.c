@@ -184,6 +184,8 @@ thread_create (const char *name, int priority,
   init_thread (t, name, priority);
   tid = t->tid = allocate_tid ();
 
+  t->block_ticks_remain = 0;  // initial the block_ticks_remain
+
   /* Prepare thread for first run by initializing its stack.
      Do this atomically so intermediate values for the 'stack' 
      member cannot be observed. */
@@ -211,6 +213,27 @@ thread_create (const char *name, int priority,
 
   return tid;
 }
+
+//new for lab2 to check if block and calculate block ticks
+void check_block_state(struct thread *thread){
+if (thread->status == THREAD_BLOCKED)
+{
+  if (thread->block_ticks_remain != 0)
+  {
+    thread->block_ticks_remain--;
+  }else if (thread->block_ticks_remain ==0)
+  {
+    thread_unblock(thread);
+  }
+  
+  
+}
+
+
+
+}
+
+
 
 /* Puts the current thread to sleep.  It will not be scheduled
    again until awoken by thread_unblock().

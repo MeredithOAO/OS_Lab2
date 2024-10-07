@@ -92,6 +92,7 @@ struct thread
 
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
+    int block_ticks_remain;              //calculate how many ticks remain to unblock thread
 
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
@@ -137,5 +138,9 @@ int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
+
+
+//new for lab 2
+void check_block_state(struct thread *thread);
 
 #endif /* threads/thread.h */
