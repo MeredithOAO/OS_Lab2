@@ -218,15 +218,18 @@ thread_create (const char *name, int priority,
 void check_block_state(struct thread *t, void *aux UNUSED){
 if (t->status == THREAD_BLOCKED)
 {
-  if (t->block_ticks_remain != 0)
+  if (t->block_ticks_remain > 0)
   {
     t->block_ticks_remain--;
+
+    if (t->block_ticks_remain ==0)
+    {
+      thread_unblock(t);
+    }
+
   } 
   
-  if (t->block_ticks_remain ==0)
-  {
-    thread_unblock(t);
-  }
+
   
   
 }
