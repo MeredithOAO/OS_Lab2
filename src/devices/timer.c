@@ -99,19 +99,11 @@ timer_sleep (int64_t ticks)
     thread->block_ticks_remain = ticks;
     thread_block();
     intr_set_level(intr_level_last);
-    
   }
-  
-
-
-
+  // old implementation:
   // ASSERT (intr_get_level () == INTR_ON);
   // while (timer_elapsed (start) < ticks) 
   // thread_yield ();
-
-
-    
-
 }
 
 /* Sleeps for approximately MS milliseconds.  Interrupts must be
