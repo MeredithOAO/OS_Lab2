@@ -194,7 +194,7 @@ thread_create (const char *name, int priority,
   /* Stack frame for kernel_thread(). */
   kf = alloc_frame (t, sizeof *kf);
   kf->eip = NULL;
-  kf->function = function;
+  kf->function = function; 
   kf->aux = aux;
 
   /* Stack frame for switch_entry(). */
