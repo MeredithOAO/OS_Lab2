@@ -56,6 +56,17 @@ typedef struct {
   unsigned long transfer_duration;
 } task_t;
 
+
+//new
+#define HIGH 1
+struct condition waitingToGo[2][2]; //Condition matrix for all task types
+struct lock block;
+int currentDirection; //either 0 or 1
+int slotsFree; // 0 <= slotsFree <= BUS_CAPACITY
+
+
+
+
 void init_bus (void);
 void batch_scheduler (unsigned int num_priority_send,
                       unsigned int num_priority_receive,
@@ -82,6 +93,20 @@ void init_bus (void) {
 
   /* TODO: Initialize global/static variables,
      e.g. your condition variables, locks, counters etc */
+
+
+          //random_init((unsigned int)123456789);
+        slotsFree=BUS_CAPACITY;
+        int i;
+        int j;
+        for (i=0; i<2; i++)
+                for (j=0; j<2; j++)
+                        cond_init(&waitingToGo[i][j]);
+        lock_init(&block); //Initiate lock
+        currentDirection=0;
+
+
+
 }
 
 void batch_scheduler (unsigned int num_priority_send,
@@ -188,6 +213,19 @@ void get_slot (const task_t *task) {
    * feel free to schedule priority tasks of the same direction,
    * even if there are priority tasks of the other direction waiting
    */
+
+
+  lock_acquire(&block); //Aquire block, or sleep until can be aquired
+  
+
+          while( slotsFree == 0 || (slotsFree < 3 && ((task->priority == NORMAL && (!list_empty(&waitingToGo[task->direction][HIGH].waiters) || !list_empty(&waitingToGo[1-task->direction][HIGH].waiters))) 
+                || currentDirection != task->direction)) ) { //|| (currentDirection != task.direction) && slotsFree != 3) { //If no free slots or the direction is different from your own -> wait 
+            cond_wait(&waitingToGo[task->direction][task->priority], &block); //Release lock and wait until signalled
+        }
+
+        slotsFree--;
+	currentDirection=task->direction;
+	lock_release(&block);
 }
 
 void transfer_data (const task_t *task) {
@@ -201,4 +239,28 @@ void release_slot (const task_t *task) {
    *       - Do you need to notify any waiting task?
    *       - Do you need to increment/decrement any counter?
    */
+
+
+          lock_acquire(&block);
+        slotsFree++;
+
+        if(!list_empty(&(waitingToGo[currentDirection][HIGH].waiters))) { //Any priority tasks in the current direction waiting?
+                cond_signal(&waitingToGo[currentDirection][HIGH], &block); //Signal one
+        } else if(!list_empty(&waitingToGo[1-currentDirection][HIGH].waiters)) { //If priority task waiting to go in the other direction
+                if (slotsFree==BUS_CAPACITY) { //Only broadcast if bus is free
+                        cond_broadcast(&waitingToGo[1-currentDirection][HIGH], &block);
+                }
+        } else if (!list_empty(&waitingToGo[currentDirection][NORMAL].waiters)) {
+
+                cond_signal(&waitingToGo[currentDirection][NORMAL], &block); //Signal one
+
+        } else if (!list_empty(&waitingToGo[1-currentDirection][NORMAL].waiters)) {
+
+                if (slotsFree==BUS_CAPACITY) { //Only broadcast if bus is free
+                        cond_broadcast(&waitingToGo[1-currentDirection][NORMAL], &block);
+                }
+        }
+        
+        lock_release(&block);
+
 }

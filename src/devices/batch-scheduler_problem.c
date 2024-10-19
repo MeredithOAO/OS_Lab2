@@ -32,7 +32,7 @@ int currentDirection; //either 0 or 1
 int slotsFree; // 0 <= slotsFree <= BUS_CAPACITY
 
 void init_bus(void);
-void batchScheduler(unsigned int num_tasks_send, unsigned int num_task_receive,
+void batch_scheduler(unsigned int num_tasks_send, unsigned int num_task_receive,
         unsigned int num_priority_send, unsigned int num_priority_receive);
 
 void senderTask(void *);
@@ -73,7 +73,7 @@ void init_bus(void){
  *  Leave the bus (3).
  */
 
-void batchScheduler(unsigned int num_tasks_send, unsigned int num_tasks_receive,
+void batch_scheduler(unsigned int num_tasks_send, unsigned int num_tasks_receive,
         unsigned int num_priority_send, unsigned int num_priority_receive)
 {
         char nameArr[7] = "Thread";
